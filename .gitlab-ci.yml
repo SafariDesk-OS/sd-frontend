@@ -1,0 +1,47 @@
+image: docker:latest
+
+services:
+  - docker:24.0.5-dind
+
+before_script:
+    - docker info
+
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+
+# Hello 
+build:
+   stage: build
+   tags:
+    #  - core
+    - deploy
+   only:
+     - main
+   script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+deploy:
+ stage: deploy
+ tags:
+   - deploy
+ only:
+   - main
+ before_script:
+   - apk add --no-cache sshpass
+ script:
+    - echo "Logging in to docker..."
+    - sshpass -p $SERVER_PASSWORD ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_IP "docker login registry.gitlab.com -u $CI_USER -p $TOKEN"
+    - echo "Pulling the latest version of the Docker registry ..."
+    - sshpass -p $SERVER_PASSWORD ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_IP "docker pull registry.gitlab.com/all1401249/rnsafarifront:main"
+    - echo "Stopping current docker daemon ..."
+    - sshpass -p $SERVER_PASSWORD ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_IP "docker stop rnsafarifront || true"
+    - echo "Removing docker daemon ..."
+    - sshpass -p $SERVER_PASSWORD ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_IP "docker rm rnsafarifront || true"
+    - echo "Starting docker daemon ..."
+    - sshpass -p $SERVER_PASSWORD ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_IP "docker run -d --name rnsafarifront -p  6900:80 registry.gitlab.com/all1401249/rnsafarifront:main"
