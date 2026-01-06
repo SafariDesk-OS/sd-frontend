@@ -79,17 +79,9 @@ const escalationSchema = z.object({
 
 const targetSchema = z.object({
   priority: z.string().min(1, 'Priority is required'),
-  first_response_time: z.number().min(1, 'First response time is required'),
-  first_response_unit: z.string().min(1, 'First response unit is required'),
-  next_response_time: z.number().min(1, 'Next response time is required'),
-  next_response_unit: z.string().min(1, 'Next response unit is required'),
   resolution_time: z.number().min(1, 'Resolution time is required'),
   resolution_unit: z.string().min(1, 'Resolution unit is required'),
   operational_hours: z.string().min(1, 'Operational hours is required'),
-  reminder_enabled: z.boolean(),
-  escalation_enabled: z.boolean(),
-  reminders: z.array(reminderSchema),
-  escalations: z.array(escalationSchema),
 });
 
 const policySchema = z.object({
@@ -133,17 +125,9 @@ const PolicyForm: React.FC<Props> = ({ onSucess }) => {
       conditions: [{ condition_type: '', operator: '', value: '', is_active: true }],
       targets: [{
         priority: '',
-        first_response_time: 1,
-        first_response_unit: 'minutes',
-        next_response_time: 1,
-        next_response_unit: 'minutes',
         resolution_time: 1,
         resolution_unit: 'minutes',
         operational_hours: '',
-        reminder_enabled: true,
-        escalation_enabled: true,
-        reminders: [],
-        escalations: [],
       }],
     },
   });
@@ -396,17 +380,9 @@ const PolicyForm: React.FC<Props> = ({ onSucess }) => {
                 type="button"
                 onClick={() => appendTarget({
                   priority: '',
-                  first_response_time: 1,
-                  first_response_unit: 'minutes',
-                  next_response_time: 1,
-                  next_response_unit: 'minutes',
                   resolution_time: 1,
                   resolution_unit: 'minutes',
                   operational_hours: '',
-                  reminder_enabled: true,
-                  escalation_enabled: true,
-                  reminders: [],
-                  escalations: [],
                 })}
                 className="flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
               >
@@ -472,71 +448,7 @@ const PolicyForm: React.FC<Props> = ({ onSucess }) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      First Response Time *
-                    </label>
-                    <input
-                      {...register(`targets.${index}.first_response_time`, { valueAsNumber: true })}
-                      type="number"
-                      className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500"
-                    />
-                    {errors.targets?.[index]?.first_response_time && (
-                      <p className="text-sm text-red-500 mt-1">{errors.targets[index].first_response_time.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Unit *
-                    </label>
-                    <select
-                      {...register(`targets.${index}.first_response_unit`)}
-                      className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500"
-                    >
-                      {choices.time_units?.map((option: any) => (
-                        <option key={option[0]} value={option[0]}>
-                          {option[1]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Next Response Time *
-                    </label>
-                    <input
-                      {...register(`targets.${index}.next_response_time`, { valueAsNumber: true })}
-                      type="number"
-                      className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500"
-                    />
-                    {errors.targets?.[index]?.next_response_time && (
-                      <p className="text-sm text-red-500 mt-1">{errors.targets[index].next_response_time.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Unit *
-                    </label>
-                    <select
-                      {...register(`targets.${index}.next_response_unit`)}
-                      className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500"
-                    >
-                      {choices.time_units?.map((option: any) => (
-                        <option key={option[0]} value={option[0]}>
-                          {option[1]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Resolution Time *
@@ -566,30 +478,6 @@ const PolicyForm: React.FC<Props> = ({ onSucess }) => {
                       ))}
                     </select>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-4 mb-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      {...register(`targets.${index}.reminder_enabled`)}
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Enable Reminders</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      {...register(`targets.${index}.escalation_enabled`)}
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Enable Escalations</span>
-                  </label>
-                </div>
-
-                {/* Reminders and Escalations would go here - simplified for now */}
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Reminders and Escalations configuration can be added in future iterations
                 </div>
               </div>
             ))}

@@ -48,6 +48,7 @@ export const APIS: Record<string, string> = {
     TICKET_UPDATE_PRIORITY: `${BASE_URL}/ticket/update/priority`,
     TICKET_UPDATE_CATEGORY: `${BASE_URL}/ticket/update/category`,
     TICKET_UPDATE_SOURCE: `${BASE_URL}/ticket/update/source`,
+    TICKET_UPDATE_DUE_DATE: `${BASE_URL}/ticket/update/due-date`,
     TICKET_ASSIGN_TO_ME: `${BASE_URL}/ticket/assign/tome/`,
     TICKET_REOPEN: `${BASE_URL}/ticket/reopen`,
     SEND_EMAIL_REPLY: `${BASE_URL}/ticket/`, // append ticketId + '/email-reply/'
@@ -155,6 +156,9 @@ export const APIS: Record<string, string> = {
     CREATE_BUSINESS_HOURS: `${BASE_URL}/sla/policies/business-hours/`,
     LOAD_BUSINESS_HOURS: `${BASE_URL}/sla/policies/business_hours/`,
     HOLIDAYS: `${BASE_URL}/sla/holidays/`,
+    SLA_CONFIG: `${BASE_URL}/sla/config/`,
+    SLA_CONFIG_CURRENT: `${BASE_URL}/sla/config/current/`,
+    SLA_CONFIG_UPDATE: `${BASE_URL}/sla/config/update_config/`,
 
     // Profile tickets counts
     PROFILE_ANALYSIS: `${BASE_URL}/ticket/profile/data/`,

@@ -205,6 +205,9 @@ export default function TicketManagementSystem() {
   const [taskDialogTicketId, setTaskDialogTicketId] = useState<string>('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const headerCheckboxRef = useRef<HTMLInputElement>(null);
+  const [allowSLA, setAllowSLA] = useState(true); // SLA configuration state
+  const [showDueDateModal, setShowDueDateModal] = useState(false);
+  const [selectedDueDate, setSelectedDueDate] = useState('');
 
   const viewModeLabel =
     viewMode === 'detailed'
@@ -977,6 +980,20 @@ export default function TicketManagementSystem() {
     fetchCategories();
   }, []);
 
+  // Fetch SLA configuration
+  useEffect(() => {
+    const fetchSLAConfig = async () => {
+      try {
+        const response = await http.get(APIS.SLA_CONFIG_CURRENT);
+        setAllowSLA(response.data?.allow_sla ?? true);
+      } catch (error) {
+        console.error('Failed to fetch SLA configuration:', error);
+        setAllowSLA(true); // Default to true if fetch fails
+      }
+    };
+    fetchSLAConfig();
+  }, []);
+
   useEffect(() => {
     if (selectedTicket) {
       setSelectedStatus(selectedTicket.status);
@@ -1206,6 +1223,47 @@ export default function TicketManagementSystem() {
       setSelectedCategoryId("");
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : "Failed to update category";
+      errorNotification(errorMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleUpdateDueDate() {
+    if (!selectedTicket || !selectedDueDate) return;
+    
+    // Validate that due date is in the future
+    const selectedDate = new Date(selectedDueDate);
+    const now = new Date();
+    if (selectedDate <= now) {
+      errorNotification('Due date must be in the future');
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      // Convert datetime-local format to ISO 8601
+      const dueDateISO = selectedDate.toISOString();
+      const payload = {
+        due_date: dueDateISO
+      };
+      const response = await http.put(`${APIS.TICKET_UPDATE_DUE_DATE}/${selectedTicket.id}`, payload);
+
+      // Update the selected ticket with new due date
+      const updatedTicket: Ticket = {
+        ...selectedTicket,
+        dueDate: response.data.due_date || dueDateISO
+      };
+      setSelectedTicket(updatedTicket);
+
+      // Update the ticket in the list
+      setTickets(prev => prev.map(t => t.id === selectedTicket.id ? updatedTicket : t));
+
+      successNotification(response.data.message || 'Due date updated successfully');
+      setSelectedDueDate('');
+      setShowDueDateModal(false);
+    } catch (error: unknown) {
+      const errorMsg = error instanceof Error ? error.message : "Failed to update due date";
       errorNotification(errorMsg);
     } finally {
       setIsSubmitting(false);
@@ -2248,7 +2306,32 @@ export default function TicketManagementSystem() {
                           </div>
                           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                             <Clock className="w-4 h-4 mr-2 text-gray-500" />
-                            Due: {selectedTicket.dueDate ? formatDate(selectedTicket.dueDate) : 'N/A'}
+                            {(user?.role.toUpperCase() === "ADMIN" || user?.role.toUpperCase() === "AGENT") ? (
+                              <span
+                                className="cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                                title="Click to change due date"
+                                onClick={() => {
+                                  // Format for datetime-local input (YYYY-MM-DDTHH:MM)
+                                  if (selectedTicket.dueDate) {
+                                    const date = new Date(selectedTicket.dueDate);
+                                    const year = date.getFullYear();
+                                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                                    const day = String(date.getDate()).padStart(2, '0');
+                                    const hours = String(date.getHours()).padStart(2, '0');
+                                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                                    setSelectedDueDate(`${year}-${month}-${day}T${hours}:${minutes}`);
+                                  } else {
+                                    setSelectedDueDate('');
+                                  }
+                                  setShowDueDateModal(true);
+                                }}
+                              >
+                                Due: {selectedTicket.dueDate ? formatDate(selectedTicket.dueDate) : 'N/A'}
+                                <Edit3 size={12} className="inline ml-1 opacity-50" />
+                              </span>
+                            ) : (
+                              <span>Due: {selectedTicket.dueDate ? formatDate(selectedTicket.dueDate) : 'N/A'}</span>
+                            )}
                           </div>
                           {selectedTicket.resolvedAt && (
                             <div className="flex items-center text-sm text-green-600 dark:text-green-400">
@@ -2335,10 +2418,12 @@ export default function TicketManagementSystem() {
                           </span>
                         )}
                       </button>
-                      <button onClick={() => setActiveTab('sla')} className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === 'sla' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'}`}>
-                        <List className="w-4 h-4" />
-                        <span>SLAs</span>
-                      </button>
+                      {allowSLA && (
+                        <button onClick={() => setActiveTab('sla')} className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === 'sla' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'}`}>
+                          <List className="w-4 h-4" />
+                          <span>SLAs</span>
+                        </button>
+                      )}
                     </nav>
                   </div>
 
@@ -2356,7 +2441,7 @@ export default function TicketManagementSystem() {
                     {activeTab === 'tasks' && (
                       <TicketTasks ticketId={Number.parseInt(selectedTicket.id)} onTaskCountChange={setLinkedTasksCount} refreshTrigger={taskRefreshTrigger} />
                     )}
-                    {activeTab === 'sla' && (
+                    {activeTab === 'sla' && allowSLA && (
                       <SlaInfo ticketId={Number.parseInt(selectedTicket.id)} />
                     )}
                   </div>
@@ -2573,6 +2658,45 @@ export default function TicketManagementSystem() {
               onClick={() => { handleUpdateDepartment(); setShowDepartmentModal(false); }}
               disabled={isSubmitting || !selectedDepartmentId}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            >
+              {isSubmitting ? 'Updating...' : 'Update'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Update Due Date Modal */}
+      <Modal
+        isOpen={showDueDateModal}
+        onClose={() => setShowDueDateModal(false)}
+        title="Update Due Date"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="due-date-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Select Due Date
+            </label>
+            <input
+              id="due-date-input"
+              type="datetime-local"
+              value={selectedDueDate}
+              onChange={(e) => setSelectedDueDate(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 outline-none"
+            />
+          </div>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => setShowDueDateModal(false)}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpdateDueDate}
+              disabled={isSubmitting || !selectedDueDate}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
             >
               {isSubmitting ? 'Updating...' : 'Update'}
             </button>

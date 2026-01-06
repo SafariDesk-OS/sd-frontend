@@ -14,17 +14,9 @@ import { TableSkeleton } from '../../../components/ui/TableSkeleton';
 type Target = {
   id: number;
   priority: string;
-  first_response_time: number;
-  first_response_unit: string;
-  next_response_time: number | null;
-  next_response_unit: string | null;
   resolution_time: number;
   resolution_unit: string;
   operational_hours: string;
-  reminder_enabled: boolean;
-  escalation_enabled: boolean;
-  reminders: any[];
-  escalations: any[];
 };
 
 // Updated Policy type
@@ -282,7 +274,7 @@ const PolicyComponent: React.FC<Props> = ({
                                 {target.priority}
                               </span>
                               <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {formatTime(target.first_response_time, target.first_response_unit)}
+                                {formatTime(target.resolution_time, target.resolution_unit)}
                               </span>
                             </div>
                           ))}
@@ -547,88 +539,7 @@ const PolicyComponent: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      First Response Time *
-                    </label>
-                    <input
-                      type="number"
-                      value={target.first_response_time}
-                      onChange={(e) => {
-                        const newTargets = [...targetsFormData];
-                        newTargets[index].first_response_time = parseInt(e.target.value) || 1;
-                        setTargetsFormData(newTargets);
-                      }}
-                      min="1"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Unit *
-                    </label>
-                    <select
-                      value={target.first_response_unit}
-                      onChange={(e) => {
-                        const newTargets = [...targetsFormData];
-                        newTargets[index].first_response_unit = e.target.value;
-                        setTargetsFormData(newTargets);
-                      }}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
-                    >
-                      {choices.time_units?.map((option: any) => (
-                        <option key={option[0]} value={option[0]}>
-                          {option[1]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Next Response Time
-                    </label>
-                    <input
-                      type="number"
-                      value={target.next_response_time || ''}
-                      onChange={(e) => {
-                        const newTargets = [...targetsFormData];
-                        newTargets[index].next_response_time = e.target.value ? parseInt(e.target.value) : null;
-                        setTargetsFormData(newTargets);
-                      }}
-                      min="1"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Unit
-                    </label>
-                    <select
-                      value={target.next_response_unit || ''}
-                      onChange={(e) => {
-                        const newTargets = [...targetsFormData];
-                        newTargets[index].next_response_unit = e.target.value || null;
-                        setTargetsFormData(newTargets);
-                      }}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="">Select unit</option>
-                      {choices.time_units?.map((option: any) => (
-                        <option key={option[0]} value={option[0]}>
-                          {option[1]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Resolution Time *
@@ -666,35 +577,6 @@ const PolicyComponent: React.FC<Props> = ({
                       ))}
                     </select>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-4 mt-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={target.reminder_enabled}
-                      onChange={(e) => {
-                        const newTargets = [...targetsFormData];
-                        newTargets[index].reminder_enabled = e.target.checked;
-                        setTargetsFormData(newTargets);
-                      }}
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Enable Reminders</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={target.escalation_enabled}
-                      onChange={(e) => {
-                        const newTargets = [...targetsFormData];
-                        newTargets[index].escalation_enabled = e.target.checked;
-                        setTargetsFormData(newTargets);
-                      }}
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Enable Escalations</span>
-                  </label>
                 </div>
               </div>
             ))}
@@ -863,74 +745,21 @@ const PolicyComponent: React.FC<Props> = ({
                               </p>
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Features</label>
-                              <div className="mt-1 flex gap-2">
-                                {target.reminder_enabled && (
-                                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                                    Reminders
-                                  </span>
-                                )}
-                                {target.escalation_enabled && (
-                                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
-                                    Escalations
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-                              <label className="block text-sm font-medium text-blue-700 dark:text-blue-300">First Response</label>
-                              <p className="mt-1 text-lg font-semibold text-blue-900 dark:text-blue-100">
-                                {formatTime(target.first_response_time, target.first_response_unit)}
-                              </p>
-                            </div>
-
-                            {target.next_response_time && (
-                              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-3">
-                                <label className="block text-sm font-medium text-yellow-700 dark:text-yellow-300">Next Response</label>
-                                <p className="mt-1 text-lg font-semibold text-yellow-900 dark:text-yellow-100">
-                                  {formatTime(target.next_response_time, target.next_response_unit!)}
-                                </p>
-                              </div>
-                            )}
-
-                            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-                              <label className="block text-sm font-medium text-green-700 dark:text-green-300">Resolution</label>
-                              <p className="mt-1 text-lg font-semibold text-green-900 dark:text-green-100">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Resolution Time</label>
+                              <p className="mt-1 text-sm text-gray-900 dark:text-white">
                                 {formatTime(target.resolution_time, target.resolution_unit)}
                               </p>
                             </div>
                           </div>
 
-                          {/* Reminders */}
-                          {target.reminders && target.reminders.length > 0 && (
-                            <div className="mt-4">
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reminders ({target.reminders.length})</label>
-                              <div className="space-y-2">
-                                {target.reminders.map((reminder: any, rIndex: number) => (
-                                  <div key={rIndex} className="bg-gray-100 dark:bg-gray-500 rounded p-2 text-xs">
-                                    <span className="font-medium">{reminder.reminder_type}:</span> {formatTime(reminder.time_before, reminder.time_unit)} before
-                                  </div>
-                                ))}
-                              </div>
+                          <div className="mt-4">
+                            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                              <label className="block text-sm font-medium text-green-700 dark:text-green-300">Resolution Target</label>
+                              <p className="mt-1 text-xl font-semibold text-green-900 dark:text-green-100">
+                                {formatTime(target.resolution_time, target.resolution_unit)}
+                              </p>
                             </div>
-                          )}
-
-                          {/* Escalations */}
-                          {target.escalations && target.escalations.length > 0 && (
-                            <div className="mt-4">
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Escalations ({target.escalations.length})</label>
-                              <div className="space-y-2">
-                                {target.escalations.map((escalation: any, eIndex: number) => (
-                                  <div key={eIndex} className="bg-gray-100 dark:bg-gray-500 rounded p-2 text-xs">
-                                    <span className="font-medium">Level {escalation.level}:</span> {formatTime(escalation.trigger_time, escalation.trigger_unit)} after
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          </div>
                         </div>
                       ))}
                     </div>
