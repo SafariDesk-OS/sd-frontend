@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { Search, Clock, CheckCircle, Circle, AlertCircle, FileText, Settings, KeyRound, AlertTriangle, Lightbulb, BookOpen, MessageCircle, PlusCircle } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import http from '../../services/http';
@@ -12,12 +13,50 @@ import ChatbotWidget from '../../components/chatbot/ChatbotWidget';
 import { Modal } from '../../components/ui/Modal';
 import { CreateTicketModal } from '../../components/tickets/CreateTicketModal';
 
+interface PortalCategory {
+  id: number;
+  name: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PortalDepartment {
+  id: number;
+  name: string;
+  slag: string;
+  created_at: string;
+}
+
 // Service Portal Content for Non-Authenticated Users
 const ServicePortalContent: React.FC = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [latestArticles, setLatestArticles] = useState<KBArticle[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(true);
+
+  // State for categories and departments
+  const [categories, setCategories] = useState<PortalCategory[]>([]);
+  const [departments, setDepartments] = useState<PortalDepartment[]>([]);
+  const [isLoadingFormData, setIsLoadingFormData] = useState(true);
+
+  // Fetch categories and departments for ticket creation
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        const response = await axios.post(APIS.VALIDATE_DOMAIN, {
+          url: window.location.href,
+        });
+        setCategories(response.data.ticket_categories || []);
+        setDepartments(response.data.departments || []);
+      } catch (error) {
+        console.error("Failed to load form data", error);
+      } finally {
+        setIsLoadingFormData(false);
+      }
+    };
+    fetchFormData();
+  }, []);
 
   useEffect(() => {
     const fetchLatestArticles = async () => {
@@ -177,67 +216,67 @@ const ServicePortalContent: React.FC = () => {
 };
 
 const calculateMonthsAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const diffMonths = Math.floor(diffDays / 30); // Approximation
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffMonths = Math.floor(diffDays / 30); // Approximation
 
-    if (diffMonths === 0) {
-        return "less than a month ago";
-    } else if (diffMonths === 1) {
-        return "1 month ago";
-    } else {
-        return `${diffMonths} months ago`;
-    }
+  if (diffMonths === 0) {
+    return "less than a month ago";
+  } else if (diffMonths === 1) {
+    return "1 month ago";
+  } else {
+    return `${diffMonths} months ago`;
+  }
 };
 
 interface Category {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 }
 
 interface Department {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 }
 
 interface AssignedTo {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone_number: string;
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
 }
 
 import { TicketData } from '../../types'; // Import TicketData type
 
 interface TicketSummary { // Renamed to avoid conflict and represent summary data
-    id: number;
-    title: string;
-    creator_name: string;
-    creator_phone: string;
-    creator_email: string;
-    ticket_id: string;
-    description: string;
-    category: Category;
-    department: Department;
-    priority: string;
-    priority_display: string;
-    is_public: boolean;
-    status: string;
-    status_display: string;
-    created_at: string;
-    assigned_to: AssignedTo | null;
+  id: number;
+  title: string;
+  creator_name: string;
+  creator_phone: string;
+  creator_email: string;
+  ticket_id: string;
+  description: string;
+  category: Category;
+  department: Department;
+  priority: string;
+  priority_display: string;
+  is_public: boolean;
+  status: string;
+  status_display: string;
+  created_at: string;
+  assigned_to: AssignedTo | null;
 }
 
 
 const CustomerIndex: React.FC = () => {
-    const navigate = useNavigate();
-  
+  const navigate = useNavigate();
+
   const { user, isAuthenticated } = useAuthStore(); // Get isAuthenticated
   const [loading, setLoading] = useState(false);
-  const [reloader, setReloader ] = useState<number>(0); // Add reloader state
+  const [reloader, setReloader] = useState<number>(0); // Add reloader state
   const [tickets, setTickets] = useState<TicketSummary[]>([]); // Use TicketSummary
 
   const loadTickets = async () => {
