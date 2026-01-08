@@ -13,10 +13,8 @@ import {
   updateMailIntegrationRouting,
   changeMailIntegrationProvider,
   updateMailIntegration,
-  provisionForwardingAddress,
   validateMailCredentials,
 } from '../../services/settings';
-import { formatDate } from '../../utils/date';
 
 interface Props {
   integration: MailIntegration | null;
@@ -32,11 +30,10 @@ interface RoutingFormValues extends MailCredentialValidationPayload {
   direction: MailIntegrationDirection;
 }
 
-const providerLabels: Record<MailIntegrationProvider, string> = {
+const providerLabels: Partial<Record<MailIntegrationProvider, string>> = {
   gmail: 'Gmail (OAuth)',
   office365: 'Microsoft 365 (OAuth)',
   custom: 'Custom IMAP/SMTP',
-  safaridesk: 'SafariDesk forwarding alias',
 };
 
 export const MailIntegrationDrawer: React.FC<Props> = ({ integration, isOpen, onClose, onUpdated, onStartOAuth }) => {
@@ -176,11 +173,7 @@ export const MailIntegrationDrawer: React.FC<Props> = ({ integration, isOpen, on
       await changeMailIntegrationProvider(integration.id, { provider, direction: effectiveDirection });
       setProviderState(provider);
       setCustomResult(null);
-      if (provider === 'safaridesk') {
-        await provisionForwardingAddress(integration.id);
-        toast.success('Forwarding alias generated');
-        onUpdated();
-      } else if (provider !== 'custom') {
+      if (provider !== 'custom') {
         toast.success('Provider updated. Complete the connection flow in the new tab.');
         await onStartOAuth({ ...integration, provider });
         onUpdated();
@@ -288,7 +281,7 @@ export const MailIntegrationDrawer: React.FC<Props> = ({ integration, isOpen, on
 
           {showProviderSelect && (
             <div className="flex flex-wrap gap-2">
-              {(['gmail', 'office365', 'custom', 'safaridesk'] as MailIntegrationProvider[]).map((provider) => (
+              {(['gmail', 'office365', 'custom'] as MailIntegrationProvider[]).map((provider) => (
                 <Button
                   key={provider}
                   size="sm"
@@ -302,77 +295,7 @@ export const MailIntegrationDrawer: React.FC<Props> = ({ integration, isOpen, on
             </div>
           )}
 
-          {currentProvider === 'safaridesk' && (
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">Alias</p>
-                  <p className="text-sm text-gray-700 dark:text-gray-200 font-mono">
-                    {integration.forwarding_address || integration.email_address || 'No alias generated yet'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    type="button"
-                    variant="secondary"
-                    onClick={async () => {
-                      const alias = integration.forwarding_address || integration.email_address;
-                      if (!alias) return;
-                      await navigator.clipboard.writeText(alias);
-                      toast.success('Alias copied');
-                    }}
-                  >
-                    Copy
-                  </Button>
-                  <Button
-                    size="sm"
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        await provisionForwardingAddress(integration.id);
-                        toast.success('Forwarding alias generated');
-                        onUpdated();
-                      } catch (error) {
-                        console.error(error);
-                        toast.error('Unable to generate alias');
-                      }
-                    }}
-                  >
-                    Regenerate alias
-                  </Button>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${integration.connection_status === 'connected'
-                      ? 'bg-green-100 text-green-800'
-                      : integration.connection_status === 'connecting'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : integration.connection_status === 'error'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-gray-100 text-gray-700'
-                    }`}
-                >
-                  {integration.connection_status || 'unknown'}
-                </span>
-                {integration.last_success_at && (
-                  <span className="text-gray-600 dark:text-gray-300">
-                    Last seen {formatDate(integration.last_success_at)}
-                  </span>
-                )}
-                {integration.last_error_message && (
-                  <span className="text-red-600 text-xs truncate max-w-xs" title={integration.last_error_message}>
-                    {integration.last_error_message}
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-500">
-                Forward your existing mailbox to this alias so SafariDesk can ingest messages. IMAP/SMTP settings are
-                not needed for SafariDesk-hosted aliases.
-              </p>
-            </div>
-          )}
+
 
           {isCustom && (
             <div className="space-y-6">

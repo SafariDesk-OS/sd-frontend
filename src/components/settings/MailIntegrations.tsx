@@ -10,7 +10,6 @@ import {
   fetchMailIntegrations,
   startGoogleMailIntegration,
   startMicrosoftMailIntegration,
-  provisionForwardingAddress,
   createMailIntegration,
   deleteMailIntegration,
   MailIntegration,
@@ -101,16 +100,7 @@ export const MailIntegrations: React.FC = () => {
     }
   };
 
-  const handleForwardingProvision = async (integration: MailIntegration) => {
-    try {
-      await provisionForwardingAddress(integration.id);
-      toast.success('Forwarding address generated');
-      refreshIntegrations();
-    } catch (error) {
-      console.error(error);
-      toast.error('Unable to provision forwarding address');
-    }
-  };
+
 
   const createStubIntegration = async (provider: MailIntegration['provider']) => {
     const payload: MailIntegrationPayload = {
@@ -154,17 +144,7 @@ export const MailIntegrations: React.FC = () => {
     }
   };
 
-  const handleSafariDeskConnect = async () => {
-    try {
-      const integration = await createStubIntegration('safaridesk');
-      await provisionForwardingAddress(integration.id);
-      toast.success('Forwarding address generated.');
-      refreshIntegrations();
-    } catch (error) {
-      console.error(error);
-      toast.error('Unable to provision SafariDesk forwarding address');
-    }
-  };
+
 
   const handleDeleteClick = (integration: MailIntegration) => {
     setConfirmDelete({ show: true, integration });
@@ -213,7 +193,7 @@ export const MailIntegrations: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
           type="button"
           onClick={handleGmailConnect}
@@ -255,20 +235,6 @@ export const MailIntegrations: React.FC = () => {
           <div className="mt-4">
             <Button size="sm" variant="secondary">
               Configure
-            </Button>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleSafariDeskConnect}
-          className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-500 text-left transition"
-        >
-          <div className="font-semibold text-gray-900 dark:text-gray-100">SafariDesk forwarding</div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Generate an alias to forward mail.</p>
-          <div className="mt-4">
-            <Button size="sm" variant="secondary">
-              Generate alias
             </Button>
           </div>
         </button>
@@ -351,14 +317,7 @@ export const MailIntegrations: React.FC = () => {
                           {integration.connection_status === 'connected' ? 'Reconnect' : 'Connect'}
                         </Button>
                       )}
-                      {integration.provider === 'safaridesk' && !integration.forwarding_address && (
-                        <Button size="sm" onClick={() => handleForwardingProvision(integration)}>
-                          Generate Forwarding Address
-                        </Button>
-                      )}
-                      {integration.forwarding_address && (
-                        <span className="text-xs text-gray-600 dark:text-gray-300">{integration.forwarding_address}</span>
-                      )}
+
                     </div>
                   </td>
                 </tr>
