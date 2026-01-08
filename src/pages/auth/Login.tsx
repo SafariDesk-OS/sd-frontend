@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail, EyeOff, Eye } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import AuthLayout from '../../components/layouts/AuthLayout';
 
 const loginSchema = z.object({
@@ -124,6 +124,18 @@ const Login: React.FC = () => {
           >
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
+
+          {/* <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Don't have an account?{' '}
+              <Link
+                to="/join"
+                className="font-medium text-blue-700 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Sign up
+              </Link>
+            </p>
+          </div> */}
         </form>
       </div>
     </AuthLayout>

@@ -8,4 +8,5 @@ export const EXEMPTED_TOKEN_ROUTES = [
     '/auth/password-reset/',
     '/business/create/',
     '/anonymous/search/ticket/',
+    '/public/search/ticket/',
   ];

@@ -43,6 +43,7 @@ interface Category {
   id: number;
   name: string;
   description: string;
+  department: number | null; // Added department field
   created_at: string;
   updated_at: string;
 }
@@ -542,28 +543,15 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               <div className="space-y-2">
                 <div className="space-y-3">
                   <div>
-                    <label className="mb-1 block text-sm font-semibold text-gray-900 dark:text-gray-100">Category</label>
-                    <select
-                      {...register('category', { valueAsNumber: true })}
-                      className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-                      disabled={loadFromApi ? loadingCategories : false}
-                    >
-                      <option value="">
-                        {loadFromApi && loadingCategories ? 'Loading categories...' : 'Select a category'}
-                      </option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.category && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category.message}</p>}
-                  </div>
-
-                  <div>
                     <label className="mb-1 block text-sm font-semibold text-gray-900 dark:text-gray-100">Department</label>
                     <select
-                      {...register('department', { valueAsNumber: true })}
+                      {...register('department', {
+                        valueAsNumber: true,
+                        onChange: () => {
+                          // Reset category when department changes
+                          setValue('category', undefined as any);
+                        }
+                      })}
                       className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                       disabled={loadFromApi ? loadingDepartments : false}
                     >
@@ -577,6 +565,31 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                       ))}
                     </select>
                     {errors.department && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.department.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-gray-900 dark:text-gray-100">Category</label>
+                    <select
+                      {...register('category', { valueAsNumber: true })}
+                      className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                      disabled={(loadFromApi ? loadingCategories : false) || !watch('department')}
+                    >
+                      <option value="">
+                        {loadFromApi && loadingCategories ? 'Loading categories...' : 'Select a category'}
+                      </option>
+                      {categories
+                        .filter(cat => {
+                          const selectedDept = watch('department');
+                          // Show if no department linked to category (global) or matches selected department
+                          return !cat.department || cat.department === Number(selectedDept);
+                        })
+                        .map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.category && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category.message}</p>}
                   </div>
                 </div>
               </div>
@@ -670,7 +683,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                 </>
               )}
             </div>
-            
+
             <div className="mt-auto mx-5 pt-6 flex items-center justify-between gap-3 border-t border-gray-200 dark:border-gray-700">
               <Button type="button" variant="outline" onClick={resetFormState}>
                 Cancel

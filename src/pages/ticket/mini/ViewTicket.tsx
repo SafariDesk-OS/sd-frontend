@@ -539,6 +539,12 @@ const TicketInfo: React.FC = () => {
     }
   }
 
+  const handleShare = () => {
+    const url = `${window.location.origin}/helpcenter/tk/${ticket.ticket_id}`;
+    navigator.clipboard.writeText(url);
+    successNotification('Public ticket link copied to clipboard');
+  };
+
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-8">
@@ -631,13 +637,18 @@ const TicketInfo: React.FC = () => {
                   {/* Primary Actions */}
                   <div className="flex items-center space-x-1">
                     <a
-                      href={ticketData ? `/helpcenter/tk/${ticketData.ticket.ticket_id}` : "/helpcenter"}
-                      target='_blank'
-                      className="inline-flex items-center justify-center w-10 h-10 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 group"
                       title="Customer Portal"
                     >
                       <LinkIcon size={18} className="group-hover:scale-110 transition-transform" />
                     </a>
+
+                    <button
+                      onClick={handleShare}
+                      className="inline-flex items-center justify-center w-10 h-10 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all duration-200 group"
+                      title="Copy Public Link"
+                    >
+                      <Share2 size={18} className="group-hover:scale-110 transition-transform" />
+                    </button>
 
                     {!isUserWatcher && (
                       <Tooltip

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { User, Mail, Building, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -312,15 +312,27 @@ const Register: React.FC = () => {
                     )}
                 </div>
 
-                <div className="text-center">
-                    <button
+                <div className="text-center space-y-4">
+                    {/* <button
                         type="button"
                         onClick={() => navigate('/site')}
                         className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
                     >
                         <ChevronLeft size={16} className="mr-1" />
                         Go Back
-                    </button>
+                    </button> */}
+                    
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Already have a business account?{' '}
+                            <Link
+                                to="/auth"
+                                className="font-medium text-blue-700 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                            >
+                                Sign in
+                            </Link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </AuthLayout>

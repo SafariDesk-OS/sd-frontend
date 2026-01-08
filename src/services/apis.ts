@@ -99,6 +99,7 @@ export const APIS: Record<string, string> = {
     SETTING_LOAD_SMTP: `${BASE_URL}/settings/smtp/get/`,
 
     UPDATE_GENERAL_SETTINGS: `${BASE_URL}/settings/general/update/`,
+    GET_GENERAL_SETTINGS: `${BASE_URL}/settings/general/info/`,
 
 
     LOAD_DASHBOARD: `${BASE_URL}/dashboard/data`,
