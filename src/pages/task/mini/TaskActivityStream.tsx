@@ -144,6 +144,7 @@ export const TaskActivityStream: React.FC<TaskActivityStreamProps> = ({
       // onCloseItem={handleCloseTask} // TODO: Implement close task functionality
       closeButtonText="Complete Task"
       loading={submitting}
+      isPublic={isCustomerView}
     />
   );
 };

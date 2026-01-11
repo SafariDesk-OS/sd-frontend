@@ -168,12 +168,16 @@ export const Sidebar: React.FC = () => {
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           {!sidebarCollapsed && (
             <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-8 h-8 bg-primary-600 rounded-lg">
-                <Compass className="text-white" size={20} />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-600 rounded-lg overflow-hidden">
+                {user?.business?.logo_url ? (
+                  <img src={user.business.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <Compass className="text-white" size={20} />
+                )}
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {user?.business.name}
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
+                  {user?.business?.name || 'Workspace'}
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Workspace

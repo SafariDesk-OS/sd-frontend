@@ -1278,11 +1278,11 @@ const TicketInfo: React.FC = () => {
               <FileText className="w-4 h-4 text-gray-600 dark:text-gray-400 mr-2" />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Description</h3>
             </div>
-            <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed prose prose-sm max-w-none dark:prose-invert  overflow-y-auto">
+            <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed prose prose-sm max-w-none dark:prose-invert overflow-y-auto">
               {ticket.description ? (
                 <div
+                  className="text-gray-700 dark:text-gray-300 leading-relaxed prose prose-sm max-w-none dark:prose-invert overflow-y-auto [&>p]:text-[11px] [&>p]:leading-relaxed [&>ul]:text-[11px] [&>ol]:text-[11px] [&>li]:text-[11px]"
                   dangerouslySetInnerHTML={{ __html: ticket.description }}
-                  className="[&_*]:!text-gray-800 dark:[&_*]:!text-gray-200"
                 />
               ) : (
                 <span className="text-gray-500 dark:text-gray-400 italic">No description provided</span>

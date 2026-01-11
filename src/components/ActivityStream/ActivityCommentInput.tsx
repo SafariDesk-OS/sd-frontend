@@ -504,7 +504,7 @@ export const ActivityCommentInput: React.FC<ActivityCommentInputProps> = ({
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
             {/* Note Type Dropdown (for comment mode) */}
-            {mode === 'comment' && (
+            {mode === 'comment' && !_isPublic && (
               <div className="relative">
                 <button
                   type="button"

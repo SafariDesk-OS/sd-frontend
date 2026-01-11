@@ -329,7 +329,7 @@ export const ActivityComment: React.FC<ActivityCommentProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="text-gray-900 dark:text-gray-100 text-sm prose prose-sm dark:prose-invert max-w-3xl prose-p:my-2 prose-headings:mt-4 prose-headings:mb-2 prose-headings:text-base prose-headings:font-semibold prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:underline hover:prose-a:text-blue-800 dark:hover:prose-a:text-blue-300">
+                <div className="text-gray-900 dark:text-gray-100 text-sm prose prose-sm dark:prose-invert max-w-3xl prose-p:my-2 prose-headings:mt-4 prose-headings:mb-2 prose-headings:text-base prose-headings:font-semibold prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:underline hover:prose-a:text-blue-800 dark:hover:prose-a:text-blue-300 [&>p]:text-[11px] [&>ul]:text-[11px] [&>ol]:text-[11px] [&>li]:text-[11px]">
                   <ContentRenderer content={comment.content} />
                 </div>
               )}
@@ -484,7 +484,7 @@ export const ActivityComment: React.FC<ActivityCommentProps> = ({
                           {format(new Date(reply.created_at), 'EEE, d MMM yyyy \'at\' h:mm a')}
                         </p>
                       </div>
-                      <div className="text-gray-800 dark:text-gray-200 ml-8 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-a:text-blue-600 dark:prose-a:text-blue-400">
+                      <div className="text-gray-800 dark:text-gray-200 ml-8 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-a:text-blue-600 dark:prose-a:text-blue-400 [&>p]:text-[11px] [&>ul]:text-[11px] [&>ol]:text-[11px] [&>li]:text-[11px]">
                         <ContentRenderer content={reply.content} />
                       </div>
                     </div>

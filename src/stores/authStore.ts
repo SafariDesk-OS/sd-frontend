@@ -415,11 +415,12 @@ updateBusiness: (businessData: Partial<SessionUser['business']>) => {
           if (user) {
             const updatedUser = {
               ...user,
-              first_name: userData.first_name || user.first_name,
-              last_name: userData.last_name || user.last_name,
-              email: userData.email || user.email,
-              phone_number: userData.phone_number || user.phone_number,
-              avatar_url: userData.avatar_url || user.avatar_url,
+              first_name: userData.first_name ?? user.first_name,
+              last_name: userData.last_name ?? user.last_name,
+              email: userData.email ?? user.email,
+              phone_number: userData.phone_number ?? user.phone_number,
+              avatar_url: userData.avatar_url ?? user.avatar_url,
+              business: userData.business ?? user.business,
             };
             set({ user: updatedUser });
           }

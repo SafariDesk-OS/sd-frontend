@@ -20,7 +20,8 @@ import {
   UserCheck2,
   Lock,
   List,
-  ChevronDown
+  ChevronDown,
+  LifeBuoy
 } from 'lucide-react';
 import Button from '../ui/Button';
 import { useUIStore } from '../../stores/uiStore';
@@ -258,23 +259,21 @@ export const Header: React.FC = () => {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-4">
             {/* Business Logo/Name */}
-            <div className="flex items-center space-x-3">
-              {/* {businessLogoUrl ? (
-                <img 
-                  src={businessLogoUrl} 
-                  alt={businessName || 'SafariDesk'} 
-                  className="w-8 h-8 object-contain rounded-lg"
-                />
-              ) : (
-                <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-green-600 to-green-700 rounded-lg shadow-md">
-                  <span className="text-white text-sm font-bold">
-                    {(businessName || user?.business?.name)?.[0]?.toUpperCase() || 'S'}
-                  </span>
-                </div>
-              )} */}
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg overflow-hidden">
+                {user?.business?.logo_url ? (
+                  <img src={user.business.logo_url} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-green-600 to-green-700 shadow-md">
+                    <span className="text-white text-sm font-bold">
+                      {user?.business?.name?.[0]?.toUpperCase() || 'S'}
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  { 'SafariDesk'}
+                  {user?.business?.name || 'SafariDesk'}
                 </h1>
               </div>
             </div>
@@ -358,6 +357,18 @@ export const Header: React.FC = () => {
               className="relative"
               title="AI Support (Coming Soon)"
             />
+
+            {/* Support URL */}
+            {user?.business?.support_url && (
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={LifeBuoy}
+                onClick={() => window.open(user.business.support_url, '_blank')}
+                className="hidden sm:flex"
+                title="Help Center"
+              />
+            )}
 
             {/* User menu */}
             <div className="relative">

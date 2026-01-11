@@ -22,6 +22,7 @@ import {
   DomainSetupGuide,
 } from '../../types/customDomain';
 import { successNotification, errorNotification } from '../ui/Toast';
+import { useAuthStore } from '../../stores/authStore';
 
 export const CustomDomainsSettings: React.FC = () => {
   const [domains, setDomains] = useState<CustomDomain[]>([]);
@@ -150,6 +151,8 @@ export const CustomDomainsSettings: React.FC = () => {
         }
         stopPolling(domainId);
         await loadDomains();
+        // Refresh profile to update global business info
+        await useAuthStore.getState().fetchCurrentUserProfile();
       } else {
         if (showNotifications) {
           errorNotification(result.message || 'Domain verification failed');
@@ -187,6 +190,8 @@ export const CustomDomainsSettings: React.FC = () => {
       successNotification('Domain deleted successfully');
       stopPolling(domainId);
       await loadDomains();
+      // Refresh profile to reset global business info if the deleted domain was the active one
+      await useAuthStore.getState().fetchCurrentUserProfile();
     } catch (error: any) {
       errorNotification(error.response?.data?.message || 'Failed to delete domain');
     }

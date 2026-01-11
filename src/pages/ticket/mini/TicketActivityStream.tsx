@@ -230,7 +230,7 @@ export const TicketActivityStream: React.FC<TicketActivityStreamProps> = ({
       onCloseItem={onClose}
       closeButtonText="Close Ticket"
       loading={submitting}
-      isPublic={!isCustomerView}
+      isPublic={isCustomerView}
       ticket={ticket}
       mailboxes={mailboxes}
     />

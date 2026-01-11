@@ -17,14 +17,30 @@ const SettingsComponent: React.FC<Props> = ({ user }) => {
   const navigate = useNavigate();
 
   const [settings, setSettings] = useState({
-    name: "SafariDesk",
-    email: "SafariDesk@example.com",
-    phone: "254700000000",
-    timezone:
-      Intl.DateTimeFormat().resolvedOptions().timeZone,
+    name: user?.business?.name || "SafariDesk",
+    email: user?.business?.email || "SafariDesk@example.com",
+    phone: user?.business?.phone || "254700000000",
+    timezone: user?.business?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    support_url: user?.business?.support_url || "",
+    domain_url: user?.business?.domain_url || "",
   });
 
-  // Check if onboarding is available to resume (reactive state)
+  // Use useEffect to sync settings when user object changes
+  useEffect(() => {
+    if (user?.business) {
+      setSettings(prev => ({
+        ...prev,
+        name: user.business.name || prev.name,
+        email: user.business.email || prev.email,
+        phone: user.business.phone || prev.phone,
+        timezone: user.business.timezone || prev.timezone,
+        support_url: user.business.support_url || prev.support_url,
+        domain_url: user.business.domain_url || prev.domain_url,
+      }));
+      if (user.business.logo_url) setLogoPreview(user.business.logo_url);
+      if (user.business.favicon_url) setFaviconPreview(user.business.favicon_url);
+    }
+  }, [user]);
   const [showResumeButton, setShowResumeButton] = useState(
     () => localStorage.getItem('onboardingCompleted') !== 'true'
   );
@@ -134,6 +150,7 @@ const SettingsComponent: React.FC<Props> = ({ user }) => {
       formData.append("email", settings.email);
       formData.append("phone", settings.phone);
       formData.append("timezone", settings.timezone); // Add timezone to form data
+      formData.append("support_url", settings.support_url);
       if (logoFile) formData.append("logo", logoFile);
       if (faviconFile) formData.append("favicon", faviconFile);
 
@@ -207,21 +224,31 @@ const SettingsComponent: React.FC<Props> = ({ user }) => {
                   type="text"
                   disabled
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-                  value={""}
+                  value={settings.domain_url}
                 />
                 <button
                   onClick={() => {
-                    // if (user?.business.domain_url) {
-                    //   // navigator.clipboard.writeText(user.business.domain_url);
-                    //   successNotification("System URL copied to clipboard!");
-                    // }
+                    if (settings.domain_url) {
+                      navigator.clipboard.writeText(settings.domain_url);
+                      successNotification("System URL copied to clipboard!");
+                    }
                   }}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 border-l-0 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600"
                   title="Copy URL"
                 >
                   <Clipboard className="w-4 h-4" />
                 </button>
-                
+                <button
+                  onClick={() => {
+                    if (settings.domain_url) {
+                      window.open(settings.domain_url, "_blank");
+                    }
+                  }}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 border-l-0 rounded-r-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600"
+                  title="Navigate to URL"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </button>
               </div>
             </div>
             <div>
@@ -231,33 +258,34 @@ const SettingsComponent: React.FC<Props> = ({ user }) => {
               <div className="flex items-center">
                 <input
                   type="text"
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-                  value={""}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  value={settings.support_url}
+                  onChange={(e) => handleInputChange("support_url", e.target.value)}
+                  placeholder="https://support.example.com"
                 />
                 <button
                   onClick={() => {
-                    // if (user?.business.support_url) {
-                    //   // navigator.clipboard.writeText(user.business.support_url);
-                    //   successNotification("Support URL copied to clipboard!");
-                    // }
+                    if (settings.support_url) {
+                      navigator.clipboard.writeText(settings.support_url);
+                      successNotification("Support URL copied to clipboard!");
+                    }
                   }}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 border-l-0 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600"
                   title="Copy URL"
                 >
                   <Clipboard className="w-4 h-4" />
                 </button>
-                {/* <button
+                <button
                   onClick={() => {
-                    if (user?.business.support_url) {
-                      window.open(user.business.support_url, "_blank");
+                    if (settings.support_url) {
+                      window.open(settings.support_url, "_blank");
                     }
                   }}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 border-l-0 rounded-r-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600"
                   title="Navigate to URL"
                 >
                   <ExternalLink className="w-4 h-4" />
-                </button> */}
+                </button>
               </div>
             </div>
             <div>

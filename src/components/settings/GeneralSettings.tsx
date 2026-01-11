@@ -5,6 +5,7 @@ import { APIS } from "../../services/apis";
 import http from "../../services/http";
 import { successNotification, errorNotification } from "../../components/ui/Toast";
 import { Upload } from "lucide-react";
+import { useAuthStore } from "../../stores/authStore";
 
 interface BusinessSettings {
   id: number;
@@ -15,9 +16,12 @@ interface BusinessSettings {
   timezone: string;
   logo_url: string;
   favicon_url: string;
+  support_url: string;
+  domain_url: string;
 }
 
 export const GeneralSettings: React.FC = () => {
+  const { fetchCurrentUserProfile } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<BusinessSettings | null>(null);
@@ -69,6 +73,7 @@ export const GeneralSettings: React.FC = () => {
       formData.append('email', settings.email || '');
       formData.append('phone', settings.phone || '');
       formData.append('timezone', settings.timezone || 'UTC');
+      formData.append('support_url', settings.support_url || '');
 
       if (logoFile) {
         formData.append('logo', logoFile);
@@ -86,8 +91,8 @@ export const GeneralSettings: React.FC = () => {
       setSettings(response.data.business);
       successNotification("Settings updated successfully");
 
-      // Update local storage or global state if needed for immediate header update
-      // Logic for that would go here if you have a global store for business info
+      // Update global state for immediate header/sidebar update
+      await fetchCurrentUserProfile();
 
     } catch (error: any) {
       errorNotification(error?.response?.data?.message || "Failed to update settings");
@@ -124,6 +129,12 @@ export const GeneralSettings: React.FC = () => {
               className="bg-gray-50 dark:bg-gray-900"
             />
             <Input
+              label="System URL"
+              value={settings?.domain_url || ''}
+              disabled
+              className="bg-gray-50 dark:bg-gray-900"
+            />
+            <Input
               label="Contact Email"
               value={settings?.email || ''}
               onChange={(e) => setSettings(prev => prev ? { ...prev, email: e.target.value } : null)}
@@ -132,6 +143,12 @@ export const GeneralSettings: React.FC = () => {
               label="Contact Phone"
               value={settings?.phone || ''}
               onChange={(e) => setSettings(prev => prev ? { ...prev, phone: e.target.value } : null)}
+            />
+            <Input
+              label="Support URL"
+              value={settings?.support_url || ''}
+              onChange={(e) => setSettings(prev => prev ? { ...prev, support_url: e.target.value } : null)}
+              placeholder="https://support.example.com"
             />
           </div>
         </div>

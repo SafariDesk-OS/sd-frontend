@@ -365,14 +365,14 @@ const TaskInfo: React.FC<Props> = () => {
               )}
             </div>
           </div>
-        </div>
+        </div> 
 
         {/* Description */}
         <div className="mt-6">
           <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Description</h3>
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
             <div
-              className="text-gray-700 dark:text-gray-300 leading-relaxed prose prose-base max-w-none dark:prose-invert overflow-y-auto [&>p]:text-[13px] [&>p]:leading-relaxed [&>ul]:text-[13px] [&>ol]:text-[13px] [&>li]:text-[13px]"
+              className="text-gray-700 dark:text-gray-300 prose prose-sm max-w-none dark:prose-invert [&>p]:text-[11px] [&>p]:leading-relaxed [&>ul]:text-[11px] [&>ol]:text-[11px] [&>li]:text-[11px]"
               dangerouslySetInnerHTML={{ __html: task.description || 'No description provided' }}
             />
           </div>
